@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}  
+
+<!-- User -->
+<br><br>
+<div class="container mx-auto">
+    <div class="row">
+        <div class="col-sm-12 col-md-6 pb-4">
+            <div class="card p-4">
+                <h4 class="card-title font-weight-bold text-center">Profile Information</h4>
+                <hr>
+                <div class="card-text">
+                    <p class="text-muted mb-0" style="font-size: 12px">Username:</p>
+                    <p>{{ user.username }}</p>
+                    <p class="text-muted mb-0" style="font-size: 12px">Email:</p>
+                    <p>{{ user.email }}</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'password_change' %}" class="btn btn-outline-info">Change Password</a>
+                        </div>
+                        <div class="col-md-6 mb-3 text-right">
+                            <a href="{% url 'update_profile' %}" class="btn btn-outline-primary">Edit Profile</a>
+                            <a href="{% url 'view_profile' %}" class="btn btn-dark">Show Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6 pb-4">
+            <div class="card p-4">
+                <h4 class="card-title font-weight-bold text-center">Annual Payment</h4>
+                <hr>
+                <div class="card-text">
+                    <p class="text-muted mb-0" style="font-size: 12px">Payment Status:</p>
+                    {% if user.is_paid %}
+                        <p>Paid</p>
+                        <p class="text-muted mb-0" style="font-size: 12px">Next Payment Date:</p>
+                        <p>{{ user.next_payment_date }}</p>
+                    {% else %}
+                        <p>Due</p>
+                        <p class="text-muted mb-0" style="font-size: 12px">Payment Due From:</p>
+                        <p>{{ user.date_joined }}</p>
+                        <p>Payment is due, please <a href="{% url 'payment_page' %}">pay now</a></p>
+                    {% endif %}
+                    
+                    <p id="vertical-space"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card p-4">
+                <h4 class="card-title font-weight-bold text-center">Request Status</h4>
+                <hr>
+                <div class="card-text">
+                    {% if user.requests.exists %}
+                        <ul>
+                            {% for request in user.requests.all %}
+                                <li>Request Id: {{ request.request_number }} - Status: {{ request.status }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No requests found.</p>
+                    {% endif %}
+                </div>
+                <div class="text-center">
+                    <a href="{% url 'submit_request' %}" class="btn btn-primary">Submit New Request</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

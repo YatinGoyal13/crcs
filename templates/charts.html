@@ -1,0 +1,196 @@
+{% extends "chartbase.html" %}
+
+{% block content %}
+<div class="content">
+    <style>
+        .dashboard-card {
+            
+            background-color: #fff;
+            width: 100%;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .container1 {
+            position:relative;
+            padding:20px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 30px;
+            min-height:200px;
+        }
+
+        .dashboard-card:nth-child(odd) {
+            grid-column: 1 / span 1;
+        }
+
+        .dashboard-card:nth-child(even) {
+            grid-column: 2 / span 1;
+        }
+    </style>
+    
+    <div class="container1 mt-3 ml-5 mr-5">
+        <div class="dashboard-card">
+            <h2>Total Societies</h2>
+            <h1>{{ total_societies }}</h1>
+        </div>
+        
+        <div class="dashboard-card">
+            <h2>State-Wise</h2>
+            <div class="chart-container">
+                <canvas id="stateSocietiesChart"></canvas>
+            </div>
+        </div>
+    </div>    
+    <div class="container1 mt-3 ml-5 mr-5">
+        <div class="dashboard-card">
+            <h2>Society-Type-Wise</h2>
+            <div class="chart-container">
+                <canvas id="sectorSocietiesChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="dashboard-card">
+            <h2>Year-Wise</h2>
+            <div class="chart-container">
+                <canvas id="yearSocietiesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Get the data for the state-wise societies
+        var stateData = JSON.parse('{{ state_data | safe }}');
+        
+        // Extract the state names and society counts
+        var stateNames = stateData.map(function(item) {
+            return item.state;
+        });
+        var societyCounts = stateData.map(function(item) {
+            return item.count;
+        });
+
+        // Create the state-wise bar chart
+        var ctxState = document.getElementById('stateSocietiesChart').getContext('2d');
+        var stateSocietiesChart = new Chart(ctxState, {
+            type: 'bar',
+            data: {
+                labels: stateNames,
+                datasets: [{
+                    label: 'Number of Societies',
+                    data: societyCounts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0
+                    }
+                }
+            }
+        });
+        
+        // Get the data for the sector-wise societies
+        var sectorData = JSON.parse('{{ sector_data | safe }}');
+        
+        // Extract the sector names and society counts
+        var sectorNames = sectorData.map(function(item) {
+            return item.society_type;
+        });
+        var sectorCounts = sectorData.map(function(item) {
+            return item.count;
+        });
+
+        // Create the sector-wise pie chart
+        var ctxSector = document.getElementById('sectorSocietiesChart').getContext('2d');
+        var sectorSocietiesChart = new Chart(ctxSector, {
+            type: 'pie',
+            data: {
+                labels: sectorNames,
+                datasets: [{
+                    label: 'Number of Societies',
+                    data: sectorCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.formattedValue;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Get the data for the year-wise societies
+        var yearData = JSON.parse('{{ year_data | safe }}');
+        
+        // Extract the years and society counts
+        var years = yearData.map(function(item) {
+            return item.year;
+        });
+        var societyCountsByYear = yearData.map(function(item) {
+            return item.count;
+        });
+
+        // Create the year-wise line chart
+        var ctxYear = document.getElementById('yearSocietiesChart').getContext('2d');
+        var yearSocietiesChart = new Chart(ctxYear, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Number of Societies',
+                    data: societyCountsByYear,
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0
+                    }
+                }
+            }
+        });
+    </script>
+</div>
+{% endblock content %}
