@@ -10,7 +10,7 @@ from django.db.models.functions import TruncYear
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html', {})
+    return render(request, 'index.html', {})
 
 '''def home(request):
 
